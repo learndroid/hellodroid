@@ -3,4 +3,5 @@
     <string name="hello_format">Hallo, %s!</string>
     <string name="ok_click_count_format">OK was clicked %d time(s).</string>
     <string name="enter_your_name">Gib deinen Namen ein</string>
+    <string name="say_hello">Sag hallo!</string>
 </resources>

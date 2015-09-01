@@ -1,5 +1,7 @@
 package net.learndroid.hellodroid;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +20,10 @@ public class HelloActivity extends AppCompatActivity {
     private static final String HELLO_WORLD_TEXT_STATE_KEY = TAG + ".HELLO_WORLD_TEXT_STATE_KEY";
     private static final String OK_CLICK_COUNT_STATE_KEY = TAG + ".OK_CLICK_COUNT_STATE_KEY";
     private static final String OK_CLICK_COUNT_TEXT_STATE_KEY = TAG + ".OK_CLICK_COUNT_TEXT_STATE_KEY";
+    private static final String TITLE_EXTRA_KEY = TAG + ".TITLE_EXTRA_KEY";
+    private static final String OK_CLICK_COUNT_RESULT_KEY = TAG + ".OK_CLICK_COUNT_RESULT_KEY";
+    /** Returned from {@link #okClickCountForResult(int, Intent)} if result does not contain the count. */
+    public static final int NO_OK_CLICK_COUNT = -1;
 
     // Attributes
     //--------------------------------------------------------------------------
@@ -28,6 +34,23 @@ public class HelloActivity extends AppCompatActivity {
     private TextView helloWorldTextView;
     private TextView okClickCountTextView;
 
+    // Static methods
+    //--------------------------------------------------------------------------
+    public static Intent newStartIntent(@NonNull final Context context, final String title) {
+        if (BuildConfig.DEBUG) Log.d(TAG, "newStartIntent()");
+        final Intent intent = new Intent(context, HelloActivity.class);
+        intent.putExtra(TITLE_EXTRA_KEY, title);
+        return intent;
+    }
+
+    public static int okClickCountForResult(final int resultCode, final Intent data) {
+        if (BuildConfig.DEBUG) Log.v(TAG, "okClickCountForResult()");
+        if (resultCode != RESULT_OK || data == null || data.getExtras() == null) {
+            return NO_OK_CLICK_COUNT;
+        }
+        return data.getExtras().getInt(OK_CLICK_COUNT_RESULT_KEY, NO_OK_CLICK_COUNT);
+    }
+
     // Life-cycle
     //--------------------------------------------------------------------------
     @Override
@@ -36,12 +59,23 @@ public class HelloActivity extends AppCompatActivity {
         if (BuildConfig.DEBUG) Log.d(TAG, "onCreate()");
         this.setContentView(R.layout.activity_hello);
         this.findViews();
+        if (this.getIntent().getExtras() != null) {
+            this.readExtras(this.getIntent().getExtras());
+        }
         if (savedInstanceState != null) {
             this.restoreInstanceState(savedInstanceState);
         }
     }
 
+    private void readExtras(@NonNull final Bundle extras) {
+        if (BuildConfig.DEBUG) Log.v(TAG, "readExtras()");
+        if (extras.containsKey(TITLE_EXTRA_KEY)) {
+            this.setTitle(extras.getString(TITLE_EXTRA_KEY));
+        }
+    }
+
     private void findViews() {
+        if (BuildConfig.DEBUG) Log.v(TAG, "findViews()");
         this.nameEditText = (EditText) this.findViewById(R.id.nameEditText);
         this.okButton = (Button) this.findViewById(R.id.okButton);
         this.helloWorldTextView = (TextView) this.findViewById(R.id.helloWorldTextView);
@@ -49,6 +83,7 @@ public class HelloActivity extends AppCompatActivity {
     }
 
     private void restoreInstanceState(@NonNull final Bundle savedInstanceState) {
+        if (BuildConfig.DEBUG) Log.v(TAG, "restoreInstanceState()");
         this.helloWorldTextView.setText(savedInstanceState.getString(HELLO_WORLD_TEXT_STATE_KEY));
         this.okClickCount = savedInstanceState.getInt(OK_CLICK_COUNT_STATE_KEY);
         this.okClickCountTextView.setText(savedInstanceState.getString(OK_CLICK_COUNT_TEXT_STATE_KEY));
@@ -56,14 +91,9 @@ public class HelloActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        if (BuildConfig.DEBUG) Log.d(TAG, "onCreateOptionsMenu()");
         this.getMenuInflater().inflate(R.menu.menu_home, menu);
         return true;
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (BuildConfig.DEBUG) Log.d(TAG, "onStart()");
     }
 
     @Override
@@ -94,22 +124,14 @@ public class HelloActivity extends AppCompatActivity {
         outState.putString(OK_CLICK_COUNT_TEXT_STATE_KEY, this.okClickCountTextView.getText().toString());
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (BuildConfig.DEBUG) Log.d(TAG, "onStop()");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (BuildConfig.DEBUG) Log.d(TAG, "onDestroy()");
-    }
-
     // UI events
     //--------------------------------------------------------------------------
     private void onOkButtonClicked() {
+        if (BuildConfig.DEBUG) Log.d(TAG, "onOkButtonClicked()");
         this.okClickCount++;
+        this.setResult(
+                RESULT_OK,
+                new Intent().putExtra(OK_CLICK_COUNT_RESULT_KEY, this.okClickCount));
         this.helloWorldTextView.setText(this.getString(
                 R.string.hello_format,
                 this.nameEditText.getText().toString())
@@ -123,6 +145,7 @@ public class HelloActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (BuildConfig.DEBUG) Log.d(TAG, "onOptionsItemSelected()");
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
