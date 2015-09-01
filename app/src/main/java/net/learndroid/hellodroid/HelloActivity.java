@@ -1,6 +1,7 @@
 package net.learndroid.hellodroid;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -14,6 +15,9 @@ public class HelloActivity extends AppCompatActivity {
     // Constants
     //--------------------------------------------------------------------------
     private static final String TAG = HelloActivity.class.getName();
+    private static final String HELLO_WORLD_TEXT_STATE_KEY = TAG + ".HELLO_WORLD_TEXT_STATE_KEY";
+    private static final String OK_CLICK_COUNT_STATE_KEY = TAG + ".OK_CLICK_COUNT_STATE_KEY";
+    private static final String OK_CLICK_COUNT_TEXT_STATE_KEY = TAG + ".OK_CLICK_COUNT_TEXT_STATE_KEY";
 
     // Attributes
     //--------------------------------------------------------------------------
@@ -32,6 +36,9 @@ public class HelloActivity extends AppCompatActivity {
         if (BuildConfig.DEBUG) Log.d(TAG, "onCreate()");
         this.setContentView(R.layout.activity_hello);
         this.findViews();
+        if (savedInstanceState != null) {
+            this.restoreInstanceState(savedInstanceState);
+        }
     }
 
     private void findViews() {
@@ -39,6 +46,12 @@ public class HelloActivity extends AppCompatActivity {
         this.okButton = (Button) this.findViewById(R.id.okButton);
         this.helloWorldTextView = (TextView) this.findViewById(R.id.helloWorldTextView);
         this.okClickCountTextView = (TextView) this.findViewById(R.id.okClickCountTextView);
+    }
+
+    private void restoreInstanceState(@NonNull final Bundle savedInstanceState) {
+        this.helloWorldTextView.setText(savedInstanceState.getString(HELLO_WORLD_TEXT_STATE_KEY));
+        this.okClickCount = savedInstanceState.getInt(OK_CLICK_COUNT_STATE_KEY);
+        this.okClickCountTextView.setText(savedInstanceState.getString(OK_CLICK_COUNT_TEXT_STATE_KEY));
     }
 
     @Override
@@ -70,6 +83,15 @@ public class HelloActivity extends AppCompatActivity {
         super.onPause();
         if (BuildConfig.DEBUG) Log.d(TAG, "onPause()");
         this.okButton.setOnClickListener(null);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (BuildConfig.DEBUG) Log.d(TAG, "onSaveInstanceState()");
+        outState.putString(HELLO_WORLD_TEXT_STATE_KEY, this.helloWorldTextView.getText().toString());
+        outState.putInt(OK_CLICK_COUNT_STATE_KEY, this.okClickCount);
+        outState.putString(OK_CLICK_COUNT_TEXT_STATE_KEY, this.okClickCountTextView.getText().toString());
     }
 
     @Override
