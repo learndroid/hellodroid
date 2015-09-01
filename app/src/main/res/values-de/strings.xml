@@ -1,3 +1,5 @@
 <resources>
     <string name="hello_world">Hallo, Welt!</string>
+    <string name="hello_format">Hallo, %s!</string>
+    <string name="enter_your_name">Gib deinen Namen ein</string>
 </resources>
